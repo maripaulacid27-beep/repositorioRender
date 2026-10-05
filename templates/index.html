@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Tareas con MongoDB en Render</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
+        form { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 8px; }
+        button { padding: 8px; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 8px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <h2>Lista de Tareas (MongoDB)</h2>
+    <form id="task-form">
+        <input type="text" id="task-input" placeholder="Nueva tarea..." required>
+        <button type="submit">Agregar</button>
+    </form>
+    <ul id="task-list"></ul>
+
+    <script>
+        const form = document.getElementById('task-form');
+        const input = document.getElementById('task-input');
+        const list = document.getElementById('task-list');
+
+        async function cargarTareas() {
+            const res = await fetch('/api/tareas');
+            const tareas = await res.json();
+            list.innerHTML = tareas.map(t => `<li>${t.titulo}</li>`).join('');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await fetch('/api/tareas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ titulo: input.value })
+            });
+            input.value = '';
+            cargarTareas();
+        });
+
+        cargarTareas();
+    </script>
+</body>
+</html>
